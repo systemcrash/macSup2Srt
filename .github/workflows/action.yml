@@ -1,0 +1,43 @@
+name: Build
+
+on:
+  pull_request:
+
+  pull_request_target:
+    types: [opened, synchronize]
+  push:
+
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        platform:
+          - macOS
+        xcode:
+          # - ^15
+          - ^16
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mxcl/xcodebuild@v3
+        with:
+          xcode: ${{ matrix.xcode }}
+          platform: ${{ matrix.platform }}
+          arch: arm64
+          action: build # default = `test`
+          code-coverage: true # default = `false`
+          warnings-as-errors: false # default = `false`
+          configuration: release # no default, ie. `xcodebuild` decides itself
+          # working-directory:
+          scheme: macSup2Srt
+        with:
+          xcode: ${{ matrix.xcode }}
+          platform: ${{ matrix.platform }}
+          arch: x86_64
+          action: build # default = `test`
+          code-coverage: true # default = `false`
+          warnings-as-errors: false # default = `false`
+          configuration: release # no default, ie. `xcodebuild` decides itself
+          # working-directory:
+          scheme: macSup2Srt
