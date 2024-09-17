@@ -25,24 +25,43 @@ jobs:
           xcode: ${{ matrix.xcode }}
           platform: ${{ matrix.platform }}
           arch: arm64
-          action: build # default = `test`
+          action: test # test, archive, build, install
           code-coverage: true # default = `false`
           warnings-as-errors: false # default = `false`
           configuration: release # no default, ie. `xcodebuild` decides itself
           # working-directory:
           scheme: macSup2Srt
-        with:
-          xcode: ${{ matrix.xcode }}
-          platform: ${{ matrix.platform }}
-          arch: x86_64
-          action: build # default = `test`
-          code-coverage: true # default = `false`
-          warnings-as-errors: false # default = `false`
-          configuration: release # no default, ie. `xcodebuild` decides itself
-          # working-directory:
-          scheme: macSup2Srt
-      # - run: ls -lR > listing.txt
-      # - uses: actions/upload-artifact@v4
+      - name: find dest root
+        run: ls -lR "/Users/runner/work/macSup2Srt/macSup2Srt"
+      # - uses: mxcl/xcodebuild@v3
       #   with:
-      #     name: macSup2Srt
-      #     path: listing.txt
+      #     xcode: ${{ matrix.xcode }}
+      #     platform: ${{ matrix.platform }}
+      #     arch: x86_64
+      #     action: install # test, archive, build, install
+      #     code-coverage: true # default = `false`
+      #     warnings-as-errors: false # default = `false`
+      #     configuration: release # no default, ie. `xcodebuild` decides itself
+      #     # working-directory:
+      #     scheme: macSup2Srt
+      # - name: build archive
+      #   run: |
+      #     xcodebuild -scheme "macSup2Srt" \
+      #     -archivePath $RUNNER_TEMP/macSup2Srt.xcarchive \
+      #     -sdk macos \
+      #     -configuration Release \
+      #     -destination generic/platform=macOS \
+      #     clean archive
+      # - name: Upload application
+      #   uses: actions/upload-artifact@v3
+      #   with:
+      #     name: app
+      #     path: ${{ runner.temp }}/build/I\ am\ Groot.ipa
+      #     # you can also archive the entire directory 
+      #     # path: ${{ runner.temp }}/build
+      #     retention-days: 3
+      # - run: ls -lR > listing.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          # name: macSup2SrtResult
+          path: "/Users/runner/work/macSup2Srt/macSup2Srt/install.xcresult"
