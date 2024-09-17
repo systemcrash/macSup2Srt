@@ -1,4 +1,4 @@
-name: Build
+name: PR Build Action
 
 on:
   pull_request:
@@ -7,61 +7,41 @@ on:
     types: [opened, synchronize]
   push:
 
+permissions:
+  contents: read
 
 jobs:
-  build:
-    strategy:
-      matrix:
-        platform:
-          - macOS
-        xcode:
-          # - ^15
-          - ^16
-    runs-on: macos-latest
+  build-x86_64:
+    name: Build x86_64
+    runs-on: macos-14
     steps:
-      - uses: actions/checkout@v4
-      - uses: mxcl/xcodebuild@v3
-        with:
-          xcode: ${{ matrix.xcode }}
-          platform: ${{ matrix.platform }}
-          arch: arm64
-          action: test # test, archive, build, install
-          code-coverage: true # default = `false`
-          warnings-as-errors: false # default = `false`
-          configuration: release # no default, ie. `xcodebuild` decides itself
-          # working-directory:
-          scheme: macSup2Srt
-      - name: find dest root
-        run: ls -lR "/Users/runner/work/macSup2Srt/macSup2Srt"
-      # - uses: mxcl/xcodebuild@v3
-      #   with:
-      #     xcode: ${{ matrix.xcode }}
-      #     platform: ${{ matrix.platform }}
-      #     arch: x86_64
-      #     action: install # test, archive, build, install
-      #     code-coverage: true # default = `false`
-      #     warnings-as-errors: false # default = `false`
-      #     configuration: release # no default, ie. `xcodebuild` decides itself
-      #     # working-directory:
-      #     scheme: macSup2Srt
-      # - name: build archive
-      #   run: |
-      #     xcodebuild -scheme "macSup2Srt" \
-      #     -archivePath $RUNNER_TEMP/macSup2Srt.xcarchive \
-      #     -sdk macos \
-      #     -configuration Release \
-      #     -destination generic/platform=macOS \
-      #     clean archive
-      # - name: Upload application
-      #   uses: actions/upload-artifact@v3
-      #   with:
-      #     name: app
-      #     path: ${{ runner.temp }}/build/I\ am\ Groot.ipa
-      #     # you can also archive the entire directory 
-      #     # path: ${{ runner.temp }}/build
-      #     retention-days: 3
-      # - run: ls -lR > listing.txt
-      - uses: actions/upload-artifact@v4
-        with:
-          # name: macSup2SrtResult
-          path: "/Users/runner/work/macSup2Srt/macSup2Srt/install.xcresult"
+    - name: Checkout the Git repository
+      uses: actions/checkout@v4
+    - name: Build x86_64
+      run: ./scripts/build.sh build x86_64
+      env:
+        DEVELOPER_DIR: '/Applications/Xcode_16.1.app/Contents/Developer'
+    # - name: find dest root
+    #   run: ls -lR "/Users/runner/work/macSup2Srt/macSup2Srt"
+    - uses: actions/upload-artifact@v4
+      with:
+        name: macSup2Srt_x86_64
+        path: "/Users/runner/work/macSup2Srt/macSup2Srt/Release/**/macSup2Srt"
+        overwrite: true
+  build-arm64:
+    name: Build arm64
+    runs-on: macos-14
+    steps:
+    - name: Checkout the Git repository
+      uses: actions/checkout@v4
+    - name: Build arm64
+      run: ./scripts/build.sh build arm64
+      env:
+        DEVELOPER_DIR: '/Applications/Xcode_16.1.app/Contents/Developer'
+    # - name: find dest root
+    #   run: ls -lR "/Users/runner/work/macSup2Srt/macSup2Srt"
+    - uses: actions/upload-artifact@v4
+      with:
+        name: macSup2Srt_arm64
+        path: "/Users/runner/work/macSup2Srt/macSup2Srt/Release/**/macSup2Srt"
+        overwrite: true
