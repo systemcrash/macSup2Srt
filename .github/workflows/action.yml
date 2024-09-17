@@ -41,3 +41,8 @@ jobs:
           configuration: release # no default, ie. `xcodebuild` decides itself
           # working-directory:
           scheme: macSup2Srt
+      # - run: ls -lR > listing.txt
+      # - uses: actions/upload-artifact@v4
+      #   with:
+      #     name: macSup2Srt
+      #     path: listing.txt
